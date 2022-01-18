@@ -147,7 +147,7 @@ while True:
                 (255, 0, 0), 2)
 
     cv2.imshow(filename, img)
-    time.sleep(0.2)
+    #time.sleep(0.2)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
