@@ -8,6 +8,8 @@ pose = mpPose.Pose()
 
 cap = cv2.VideoCapture('vids/kid.mp4')
 pTime = 0
+cap_fps = cap.get(cv2.CAP_PROP_FPS)
+print("capture fps is:" + str(cap_fps))
 while True:
     success, img = cap.read()
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -34,6 +36,6 @@ while True:
 
     # Press 'q' to quit
     key = cv2.waitKey(1) & 0xFF
-    # if the `q` key was pressed, break from the loop
+    # if the `q` key was pressed, end loop
     if key == ord('q'):
         break

@@ -3,6 +3,7 @@ import mediapipe as mp
 import time
 import math
 
+# this is the pose module used for further functionality
 
 class poseDetector():
 
@@ -77,6 +78,8 @@ class poseDetector():
             cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50),
                         cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
         return angle
+
+
 
 def main():
     cap = cv2.VideoCapture("vids/kid.mp4")
