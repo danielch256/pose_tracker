@@ -5,13 +5,10 @@ from PyQt5.QtCore import *
 import cv2
 import time
 import mediapipe as mp
+from tests import test_1, test_2
 
-mpDraw = mp.solutions.drawing_utils
-mpPose = mp.solutions.pose
-pose = mpPose.Pose()
 source = [cv2.VideoCapture('vids/kid.mp4')]
 test = [0]
-
 class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -29,15 +26,18 @@ class MainWindow(QWidget):
         self.camera_button.toggled.connect(self.camera_selected)
         self.source_select.addWidget(self.camera_button)
 
-        #self.main_layout.addLayout(self.top_layout)
-
         #test_selector dropdown menu
         self.test_selector = QComboBox()
         self.test_selector.addItems(["test1:ssh", "test2", "test3"])
         self.test_selector.activated.connect(self.activated)
-        self.test_selector.currentTextChanged.connect(self.text_changed)
-        self.test_selector.currentIndexChanged.connect(self.index_changed)
-        #self.main_layout.addWidget(self.test_selector)
+        self.test_selector.currentTextChanged.connect(self.test_selector_text_changed)
+        self.test_selector.currentIndexChanged.connect(self.test_selector_index_changed)
+
+        self.fileOpenButton = QPushButton('Load video file', self)
+        self.fileOpenButton.clicked.connect(self.load_video)
+
+
+
 
         #video control buttons
         self.vc_buttons = QHBoxLayout()
@@ -93,12 +93,12 @@ class MainWindow(QWidget):
     def camera_selected(self, selected):
         if selected:
             print("camera selected")
-            source[0] = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+            #filename = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
     def file_selected(self, selected):
         if selected:
             print("file selected")
-            source[0] = cv2.VideoCapture('vids/kid.mp4')
+            #source[0] = cv2.VideoCapture('vids/kid.mp4')
 
     def ImageUpdateSlot(self, Image):
         self.FeedLabel.setPixmap(QPixmap.fromImage(Image))
@@ -113,21 +113,27 @@ class MainWindow(QWidget):
         pass
         #print("Activated index:", index)
 
-    def text_changed(self, s):
+    def test_selector_text_changed(self, s):
         pass
         #print("Text changed:", s)
 
-    def index_changed(self, index):
-        #print("Index changed", index)
+    def test_selector_index_changed(self, index):
         print('test[0]=', index)
         test[0] = index
 
+    def load_video(self):
+        global filename
+        filename,_ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                  "All Files (*);;Python Files (*.py)")
+        if filename:
+            print(filename)
     def createForm(self):
         # creating a form layout
         self.left_form = QFormLayout()
         # adding rows
         # for name and adding input text
         self.left_form.addRow(QLabel("SOURCE:"), self.source_select)
+        self.left_form.addWidget(self.fileOpenButton)
         self.left_form.addRow(QLabel("TEST:"), self.test_selector)
         self.left_form.addRow(self.groupbox)
 
@@ -154,25 +160,34 @@ class Worker1(QThread):
         self.ThreadActive = True
         #capture = cv2.VideoCapture('vids/kid.mp4')
 
-        capture = source[0]
+        capture = cv2.VideoCapture(filename)
 
         while self.ThreadActive:
             ret, frame = capture.read()
+            #cap_fps = Image.get(cv2.CAP_PROP_FPS)  # determine source fps
+            #print("capture fps is:" + str(cap_fps))
             #time.sleep(0.015)
             Image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+
+            #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
             if test[0] == 0:
-                results = pose.process(Image)
-                lmList = []
-                if results.pose_landmarks:
-                    mpDraw.draw_landmarks(Image, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
-                    for id, lm in enumerate(results.pose_landmarks.landmark):
-                        h, w, c = Image.shape
-                        cx, cy = int(lm.x * w), int(lm.y * h)  # get pixel values instead of ratio of picture width
-                        # print(id, cx,cy)
-                        lmList.append([id, cx, cy])  # list of id, x and y coords of all 33 landmarks
-                        cv2.circle(Image, (cx, cy), 5, (255, 0, 0), cv2.FILLED)  # draw blue dots
-                    cv2.circle(Image, (lmList[14][1], lmList[14][2]), 5, (0, 255, 0),
-                               cv2.FILLED)  # draw green dot on landmark 14
+                test_1(Image)
+                # results = pose.process(Image)
+                # lmList = []
+                # if results.pose_landmarks:
+                #     mpDraw.draw_landmarks(Image, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
+                #     for id, lm in enumerate(results.pose_landmarks.landmark):
+                #         h, w, c = Image.shape
+                #         cx, cy = int(lm.x * w), int(lm.y * h)  # get pixel values instead of ratio of picture width
+                #         # print(id, cx,cy)
+                #         lmList.append([id, cx, cy])  # list of id, x and y coords of all 33 landmarks
+                #         cv2.circle(Image, (cx, cy), 5, (255, 0, 0), cv2.FILLED)  # draw blue dots
+                #     cv2.circle(Image, (lmList[14][1], lmList[14][2]), 5, (0, 255, 0),
+                #                cv2.FILLED)  # draw green dot on landmark 14
+            elif test[0] == 1:
+                test_2(Image)
             else:
                 pass
 
