@@ -12,7 +12,7 @@ import pathlib
 with open("pickles/side_vids", "rb") as fp:   # Unpickling
     filenames = pickle.load(fp)
 
-filename = filenames[8]
+filename = filenames[17]
 filepath = pathlib.Path(filename).parent
 file_itself = pathlib.Path(filename).stem
 print(filename)
@@ -37,6 +37,7 @@ lm_df = pd.DataFrame()
 angle_df = pd.DataFrame()
 df_list = []
 df_angle_list = []
+
 # load pose detector from imported pose_module
 detector = pm.poseDetector()
 
@@ -68,12 +69,18 @@ while True:
     df_list.append(temp_list)  # append to list outside scope, dont use pandas because its slow
 
     # find angle in a joint (btwn 3 keypoints)
-    angle_13 = detector.findAngle(img, 12, 24, 26)  # l elbow angle
-    #df_angle_list.append(angle_13)
-    df_angle_list.append("angle_13, " + str(frame) + ", "+ str(angle_13))
-    #angle_25 = detector.findAngle(img, 23, 25, 27)  # l knee angle (outer)
-    #angle_26 = detector.findAngle(img, 24, 26, 28)  # r knee (inner)
+    r_hip_angle = detector.findAngle(img, 12, 24, 26)
+    df_angle_list.append([frame, "r_hip", r_hip_angle])
+    #df_angle_list.append(str(frame) + ", " + "r_hip, " + str(r_hip_angle))
 
+    r_shoulder_angle = detector.findAngle(img, 14, 12, 24)
+    df_angle_list.append([frame, "r_shoulder",r_shoulder_angle])
+
+    r_knee_dors_angle = detector.findAngle(img, 28,26,24)
+    df_angle_list.append([frame, "r_knee_dors", r_knee_dors_angle])
+
+    r_ankle_flex = detector.findAngle(img, 26,30,32)
+    df_angle_list.append([frame, "r_ankle_flex", r_ankle_flex])
 
     #parallel torso checker
     hip_r = lmList[24]
@@ -85,37 +92,34 @@ while True:
     torso_delta_x = shoulder_r[1] - hip_r[1]
     if torso_delta_y and torso_delta_x:
         torso_lean = round(torso_delta_y / torso_delta_x, 2)
+    else:
+        print("torso lean not found")
+        pass
 
     tibia_delta_y = ankle_r[2] - knee_r[2]
     tibia_delta_x = knee_r[1] - ankle_r[1]
     if tibia_delta_y and tibia_delta_x:
         tibia_angle = round(tibia_delta_y / tibia_delta_x, 2)
+    else:
+        print("tibia angle not found")
+        pass
 
-    # print(shoulder_r)
-    # print(hip_r)
-    #
-    # print(torso_delta_y)
-    # print(torso_delta_x)
-    #print("torso: "  + str(torso_lean))
-    #print("tibia: " + str(tibia_angle))
-    #torso_lean_deg = math.atan(torso_lean)
-    #print("torsot lean deg: "  + str(torso_lean_deg))
     if torso_lean > tibia_angle and upright is False:
         print('squat stance: upright')
         upright = True
     elif torso_lean > tibia_angle and upright is True:
         pass
-    elif torso_lean < tibia_angle and angle_13 > 120:
+    elif torso_lean < tibia_angle and r_hip_angle > 120:
         #print("squat stance: forward lean but hip extended past 120deg")
         pass
-    elif torso_lean < tibia_angle and angle_13 < 120:
+    elif torso_lean < tibia_angle and r_hip_angle < 120:
         print('squat stance: too much forward lean')
         upright = False
     else:
         pass
 
 
-    #horizontal femur
+    # horizontal femur
     if hip_r[2] > knee_r[2] and below_parallel is False:
         below_parallel = True
         depth_achieved = True
@@ -125,6 +129,14 @@ while True:
         print('femur no longer parallel')
     else:
         pass
+
+    # femur angle calculator
+    femur_delta_y = knee_r[2] - hip_r[2]
+    femur_delta_x = knee_r[1] - hip_r[1]
+    if femur_delta_y and femur_delta_x:
+        femur_angle = round(femur_delta_y / femur_delta_x, 2)
+    femur_angle = math.degrees(math.atan(femur_angle))
+    femur_angle = round(femur_angle, 2)
 
     #hands and ankles in line
     wrist_r = lmList[16]
@@ -158,6 +170,12 @@ while True:
                 (255, 0, 0), 2)
     cv2.putText(img, ('fps: ' + str(int(fps))), (10, 40), cv2.FONT_HERSHEY_PLAIN, 2,
                 (255, 0, 0), 2)
+    cv2.line(img, (-10, knee_r[2]), (knee_r[1], knee_r[2]), (0, 255, 0), thickness=2)
+    cv2.putText(img, ('femur angle: ' + str(femur_angle)), (10, 200), cv2.FONT_HERSHEY_PLAIN,
+                2,
+                (255, 0, 0), 2)
+
+
 
     if below_parallel is True:
         cv2.putText(img, ('femur below parallel!!: ' + str(count)), (10, 80), cv2.FONT_HERSHEY_PLAIN, 2,
@@ -192,8 +210,8 @@ lm_df.to_csv('outputs/' + str(file_itself) + " - coordinates.csv", index=False)
 
 angle_df = pd.DataFrame(df_angle_list)
 angle_df.reset_index(drop=True, inplace=True)
-#angle_df.columns = columns
-angle_df.to_csv('outputs/' + str(file_itself) + " - angle_13.csv", index=False)
+angle_df.columns = ['frame', 'name', 'angle']
+angle_df.to_csv('outputs/' + str(file_itself) + " - angles.csv", index=False)
 
 # Scoring
 print("FMS Testing:")
