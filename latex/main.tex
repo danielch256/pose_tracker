@@ -1,0 +1,187 @@
+\documentclass[12pt,twocolumn]{article}
+\usepackage{amsmath, amssymb, amsthm, graphicx, epsfig, fancyhdr}
+\usepackage{grffile}
+\usepackage{blindtext}% MWE only
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage[landscape]{geometry}
+\usepackage{tabularx}
+\usepackage{textcomp}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=15mm,
+ right=15mm,
+ top=20mm,
+ bottom=25mm
+ }
+
+
+
+\title{Math 240 Overleaf Form}
+\author {Jose Delgado}
+
+\setlength{\headheight}{28pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\var{event}}
+\fancyhead[C]{\Large \var{first} \var{last}}
+\fancyhead[R]{\var{location}}
+\fancyfoot[C]{\thepage}
+% package to open file containing variables
+\usepackage{datatool, filecontents}
+\usepackage{graphicx}
+\DTLsetseparator{,}% Set the separator between the columns.
+
+% import data
+\DTLloaddb[noheader, keys={thekey,thevalue}]{mydata}{../mydata.dat}
+% Loads mydata.dat with column headers 'thekey' and 'thevalue'
+\newcommand{\var}[1]{\DTLfetch{mydata}{thekey}{#1}{thevalue}}
+\begin{document}
+
+%\fbox{
+\begin{minipage}[t][8cm]{.95\linewidth}
+\begin{center}
+\begin{tabular}{lllr}
+
+    \smash{ \raisebox{-\height}{\var{report_img_2}}}&
+              \multicolumn{2}{c}{Information} \\
+  \cmidrule(r){2-3}
+    & Id:& \var{id}&\\
+        &Name:& \var{first}& \\
+        &&\var{last}&\\
+    &Age:& \var{age}&\\
+        &Height& \var{height}&\\
+    &Event date:& \var{date}&\\
+
+
+    %&number of frames:&30&\\
+   % & nr frames w forward fall& 23& 6percent\\ this is in side view now
+%&&&\\
+      \cmidrule(r){2-3}
+            &Lowest squat depth:& \var{lsa}\textdegree&\\
+                &Standing limb ratio:& \var{torso_length}: \var{femur_length}: \var{tib_length}&\\
+
+
+
+    &&&\\
+      &\multicolumn{2}{c}{FMS score} \\
+  \cmidrule(r){2-3}
+    &Suggested score:&\var{fms_score}&\\
+
+
+
+
+\end{tabular}
+%\raisebox{-.5\height}{\var{sqt_image_qrt}}
+\end{center}
+\end{minipage}
+%}
+
+%\fbox{
+\begin{minipage}[t][8cm]{.95\linewidth}
+%\subsection{FMS Scoring}
+    \begin{center}
+        \begin{tabular}{l}
+        \\
+            \var{front_view_graph}\\
+        \\
+            \var{side_view_graph}\\
+\end{tabular}
+
+    \end{center}
+
+\end{minipage}
+%}
+%\fbox{
+\begin{minipage}[t][8cm]{.95\linewidth}
+%\subsection{Side view:}
+%\begin{description}
+%\item[Lowest squat:] \var{lsa}
+%
+%    \item[shoulder flexion angle:] \var{sfa_min}, \var{sfa_max}
+%    \item[hip flexion angle:] \var{hfa_min}, \var{hfa_max}
+%    \item[dorsal knee angle:]\var{dors_kfa_min}, \var{dors_kfa_max}
+%    \item[shin lean:] \var{tib_lean_min}, \var{tib_lean_max}
+%    \item[torso forward lean:] \var{torso_lean_min}, \var{torso_lean_max}
+%\end{description}
+\begin{center}
+\begin{tabular}{lrrr}
+  \multicolumn{2}{c}{Side View}&& \smash{ \raisebox{-\height}{  \var{report_img_1}}} \\
+  \cmidrule(r){1-3}
+&min&max&\\
+
+  \cmidrule(r){2-3}
+
+
+        a) Shoulder flexion & \var{sfa_min}\textdegree& \var{sfa_max}\textdegree&\\
+        b) Hip flexion & \var{hfa_min}\textdegree& \var{hfa_max}\textdegree& \\
+    c) Torso lean &\var{torso_lean_min}\textdegree& \var{torso_lean_max}\textdegree&\\
+       d) Shin lean & \var{tib_lean_min}\textdegree& \var{tib_lean_max}\textdegree&\\
+        &&&\\
+      \multicolumn{2}{c}{FMS Parameters} \\
+      \cmidrule(r){1-3}
+
+    e) Squat depth& \var{lsa}\textdegree& \var{squat_bool} &\\
+    Torso not upright:& \var{torso_fall_pct}\%& \var{torso_bool} &\\
+%      & lowest angle: & \var{torso_lean_min}\textdegree&\\
+
+    Hands not inline:& \multicolumn{2}{c}{ \var{hands_forward_pct} \%} \\
+    Hands back/forward& \multicolumn{2}{c}{ \var{hands_back}/\var{hands_forward}}\\
+   Hand deviation angle&max: & \var{hands_forward_angle}\textdegree &\\
+
+ &&&\\
+&&&\\
+  \multicolumn{2}{c}{Front View}&  \\
+  \cmidrule(r){1-3}
+&min&max&\smash{ \raisebox{-\height}{  \var{report_img_3}}}\\
+
+  \cmidrule(r){2-3}
+
+  Q-angle left & \var{q_angle_l_min}\textdegree & \var{q_angle_l_max}\textdegree&\\
+  right & \var{q_angle_r_min}\textdegree & \var{q_angle_r_max}\textdegree&\\
+    Ankle left & \var{ankle_l_min}\textdegree & \var{ankle_l_max}\textdegree & \\
+  right & \var{ankle_r_min}\textdegree & \var{ankle_r_max}\textdegree & \\
+ Shoulder left & \var{shoulder_l_min}\textdegree & \var{shoulder_l_max}\textdegree & \\
+  right & \var{shoulder_r_min}\textdegree & \var{shoulder_r_max}\textdegree& \\
+    \cmidrule(r){1-3}
+
+        Hip x-shift & \multicolumn{2}{c}{\var{hip_shift}\%}  \\
+        Knee x-shift & \multicolumn{2}{c}{\var{knee_shift}\%} \\
+
+    &&&\\
+      \multicolumn{2}{c}{FMS Parameters} \\
+      \cmidrule(r){1-3}
+
+    Knee valgus  left: & \multicolumn{2}{c}{\var{valgus_l_bool}}&\\
+      right: & \multicolumn{2}{c}{\var{valgus_r_bool}}&\\
+\end{tabular}
+%\raisebox{-.5\height}{\var{sqt_image_qrt}}
+\end{center}
+
+\end{minipage}
+%}
+
+%\fbox{
+\begin{minipage}[t][8cm]{.95\linewidth}
+
+\begin{center}
+\begin{tabular}{llrr}
+
+
+    \end{tabular}
+    \end{center}
+\end{minipage}%
+%}
+%\hfill %no idea why lol but fixes slightly screwy mininpage alignment
+%\onecolumn
+%\begin{figure}[h]
+%        %\centering
+%        \var{sqt_depth_graph}
+%        \var{sqt_depth_graph}
+%        \var{sqt_depth_graph}
+%
+%       % \caption{I need to fix the pose runner for this but nyi and also make a better croppper}
+%        \end{figure}
+
+\end{document}

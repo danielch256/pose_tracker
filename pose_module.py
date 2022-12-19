@@ -9,12 +9,12 @@ class poseDetector():
 
     def __init__(self,
                  static_image_mode=False,
-                 model_complexity=1,
+                 model_complexity=2,
                  smooth_landmarks=True,
                  enable_segmentation=False,
                  smooth_segmentation=True,
                  min_detection_confidence=0.5,
-                 min_tracking_confidence=0.5):
+                 min_tracking_confidence=0.85):
 
         self.mode = static_image_mode
         self.complexity = model_complexity
